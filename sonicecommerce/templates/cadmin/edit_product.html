@@ -1,0 +1,125 @@
+{% extends 'cadmin/base.html' %}
+
+{% block content %}
+<body>
+    <div class="container">
+        <h1>Edit Product</h1>
+
+        <form action="#" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label>Product Name</label>
+                    {{ form.product_name }}
+                </div>
+                <div class="form-group col-md-12">
+                    <label>Product Slug</label>
+                    {{ form.slug }}
+                </div>
+                <div class="form-group col-md-12">
+                    <label>Categories</label>
+                    {{ form.category }}
+                </div>
+                <div class="form-group col-md-12">
+                    <label>Description</label>
+                    {{ form.description }}
+                </div>
+               
+                <div class="form-group col-md-2">
+                    <label for="is_available" class="form-label">Is Available</label>
+                    <div class="form-check text-left">
+                        {{ form.is_available }}
+                    </div>
+                </div>
+
+                <!-- Main Image Upload with Preview -->
+                <div class="form-group col-md-12">
+                    <label>Main Image</label>
+                    {{ form.image }}
+                    <!-- Conditional Preview container for the main image -->
+                    <div class="image-preview mt-2" id="mainImagePreviewContainer" style="{% if not form.instance.image %}display:none;{% endif %}">
+                        <img id="mainImagePreview" src="{% if form.instance.image %}{{ form.instance.image.url }}{% endif %}" alt="Main Image Preview" style="max-width: 200px; max-height: 200px;">
+                    </div>
+                </div>
+
+                <!-- Sub Images -->
+                <div class="form-group sub-images">
+                    <label for="images" class="form-label">Sub Images</label>
+                    <div class="form-group">
+                        <h2>Product Images</h2>
+                        {{ formset.management_form }}
+                        <div class="row">
+                            <!-- Bootstrap grid for each sub-image form -->
+                            {% for form in formset %}
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        {{ form.as_p }}
+                                        <!-- Conditional Preview container for each sub image -->
+                                        <div class="image-preview" id="subImagePreviewContainer{{ forloop.counter }}" style="{% if not form.instance.image %}display:none;{% endif %}">
+                                            <img id="preview{{ forloop.counter }}" src="{% if form.instance.image %}{{ form.instance.image.url }}{% endif %}" alt="Image preview" style="max-width: 200px; max-height: 200px;">
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+    </div>
+
+    <!-- JavaScript to handle image previews -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to handle file input change
+            function handleFileInputChange(event) {
+                const input = event.target;
+                const previewId = input.dataset.previewId;
+                const preview = document.getElementById(previewId);
+                const previewContainer = document.getElementById(previewId + 'Container');
+
+                if (input.files && input.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        previewContainer.style.display = 'block'; // Show the preview container when the image is selected
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                } else {
+                    previewContainer.style.display = 'none'; // Hide the preview container if no image is selected
+                }
+            }
+
+            // Main image preview
+            const mainImageInput = document.querySelector('input[name="image"]');
+            const mainImagePreviewContainer = document.getElementById('mainImagePreviewContainer');
+            mainImageInput.addEventListener('change', function() {
+                const mainImagePreview = document.getElementById('mainImagePreview');
+                const file = mainImageInput.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    mainImagePreview.src = e.target.result;
+                    mainImagePreviewContainer.style.display = 'block'; // Show the main image preview
+                };
+
+                if (file) {
+                    reader.readAsDataURL(file);
+                } else {
+                    mainImagePreviewContainer.style.display = 'none'; // Hide the main image preview if no file is selected
+                }
+            });
+
+            // Attach event listeners to all sub-image file inputs
+            document.querySelectorAll('input[type="file"]').forEach((input, index) => {
+                const previewId = `preview${index + 1}`;
+                const previewContainerId = `subImagePreviewContainer${index + 1}`;
+                input.dataset.previewId = previewId;
+                input.addEventListener('change', handleFileInputChange);
+            });
+        });
+    </script>
+</body>
+{% endblock %}

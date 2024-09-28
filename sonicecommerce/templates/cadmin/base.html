@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/cadmin.css' %}">
+    <link rel="stylesheet" href="{% static 'css/product.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/5.5.0/collection/components/icon/icon.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/editproduct.css' %}">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" ></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropper/4.1.0/cropper.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropper/4.1.0/cropper.css"  />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropper/4.1.0/cropper.js"></script>
+   
+
+    <style>
+    .not-visible {
+        display:none;
+    }
+    </style>
+    
+    
+    {% block extra_head %}{% endblock %}
+    <style>
+        /* Hide sidebar for large windows when collapsed */
+        @media (min-width: 1024px) {
+            .sidebar.collapsed {
+                display: none;
+            }
+            .main-content.collapsed {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content" id="mainContent">
+        <button class="hide-sidebar-button" id="hideSidebarButton">Hide Sidebar</button>
+        {% block content %}
+        {% endblock %}
+    </div>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="#" class="sidebar-brand">
+                <ion-icon name="logo-apple"></ion-icon> SONIC
+            </a>
+            <button class="sidebar-toggler" id="sidebarToggle" aria-label="Toggle Sidebar">
+                <ion-icon name="menu-outline"></ion-icon>
+            </button>
+        </div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'admin_dashbord' %}">
+                    <ion-icon name="home-outline"></ion-icon> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'user_detail_page' %}active{% endif %}" href="{% url 'user_detail_page' %}">
+                    <ion-icon name="people-outline"></ion-icon> Customers
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'product_detail_page' %}active{% endif %}" href="{% url 'product_detail_page' %}">
+                    <ion-icon name="chatbubble-outline"></ion-icon> Products
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'variation_view' %}active{% endif %}" href="{% url 'variation_view' %}">
+                    <ion-icon name="chatbubble-outline"></ion-icon> Product Variation
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'category_detail_page' %}active{% endif %}" href="{% url 'category_datail_page' %}">
+                    <ion-icon name="help-outline"></ion-icon> Categories
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'coupon_detail' %}active{% endif %}" href="{% url 'coupon_detail' %}">
+                    <ion-icon name="settings-outline"></ion-icon> Coupons
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'manage_order_requests' %}active{% endif %}" href="{% url 'manage_order_requests' %}">
+                    <ion-icon name="settings-outline"></ion-icon> Manage Request
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'offer_view' %}active{% endif %}" href="{% url 'offer_view' %}">
+                    <ion-icon name="settings-outline"></ion-icon> Offers
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'order_list' %}">
+                    <ion-icon name="log-out-outline"></ion-icon> Order List
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'sale_report' %}">
+                    <ion-icon name="log-out-outline"></ion-icon> Sale Report
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'logoutt' %}">
+                    <ion-icon name="log-out-outline"></ion-icon> Logout
+                </a>
+            </li>
+        </ul>
+    </div>
+
+   
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const hideSidebarButton = document.getElementById('hideSidebarButton');
+
+        sidebarToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('collapsed');
+        });
+
+        hideSidebarButton.addEventListener('click', function() {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('collapsed');
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+

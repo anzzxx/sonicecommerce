@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/product_detail.css' %}">
+<script src="{% static 'js/product_detail.js' %}"></script>
+
+<section class="section-content padding-y bg">
+    <div class="container">
+        <!-- Product Gallery -->
+        <div class="card">
+            <div class="row no-gutters">
+                <aside class="col-md-6">
+                    <article class="gallery-wrap">
+                        <!-- Main Image -->
+                        <div class="img-big-wrap">
+                            <a href="#" id="main-image-link">
+                                <img id="main-image" src="{{ single_product.image.url }}" class="img-fluid zoom-img">
+                            </a>
+                        </div>
+                    
+                        <!-- Additional Images -->
+                        <div class="img-small-wrap">
+                            <img src="{{ single_product.image.url }}" class="img-thumbnail small-thumb"
+                                onclick="changeImage('{{ single_product.image.url }}')">
+                            {% for image in product_images %}
+                            <div class="item-gallery">
+                                <img src="{{ image.image.url }}" class="img-thumbnail small-thumb"
+                                    onclick="changeImage('{{ image.image.url }}')">
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </article>
+                    
+                </aside>
+                <main class="col-md-6 border-left">
+                    <form action="{% url 'add_cart' single_product.id %}" method="POST">
+                        {% csrf_token %}
+                        <article class="content-body">
+                            <h2 class="title">{{ single_product.product_name }}</h2>
+                    
+                            <div class="mb-3">
+                                <div class="price mt-1">
+                                    {% if discounted_price %}
+                                        <!-- Original price with a line-through -->
+                                        <span id="priceDisplay" style="text-decoration: line-through; color: #888; margin-right: 10px;">
+                                            ${{ single_product.price|floatformat:2 }}
+                                        </span>
+                                        <!-- Discounted price -->
+                                        <span id="discount" style="color: #e74c3c; font-weight: bold;">
+                                            ${{ default_variation.price|floatformat:2 }}
+                                        </span>
+                                        <!-- Discount percentage -->
+                                        <div class="discount mt-1" style="color: #28a745; font-size: 1.2em; font-weight: bold;">
+                                            off {{ percentage }}%
+                                        </div>
+                                    {% else %}
+                                        <!-- Single price if no discount -->
+                                        <span id="priceDisplay" style="font-weight: bold; color: #000;">
+                                            ${{ single_product.price|floatformat:2 }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Stock information -->
+                                <div id="stock" class="stock mt-1">{{ default_variation.quantity }} pieces left</div>
+                            </div>
+                    
+                            <p>{{ single_product.description }}</p>
+                            <hr>
+                            <div class="row">
+                                <div class="item-option-select">
+                                    <h6>Choose Color</h6>
+                                    <div id="colorOptions">
+                                        {% if variations %}
+                                            {% for i in variations %}
+                                            <div class="variation-circle" 
+                                                style="width: 20px; height: 20px; background-color: {{ i.variation_value | lower }}; border-radius: 50%; display: inline-block; margin-right: 10px; cursor: pointer;" 
+                                                onclick="selectColor('{{ i.variation_value | lower }}')">
+                                            </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p>No colors available</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            
+                            <!-- Hidden input to store selected color -->
+                           <input type="hidden" name="selected_color" id="selected-color">
+                    
+                            {% if default_variation.quantity <= 0 %}
+                            <h5 class="text-danger">Out of stock</h5>
+                            {% else %}
+                            <button type="submit" class="btn btn-primary">
+                                <span class="text">Add to cart</span>
+                                <i class="fas fa-shopping-cart"></i>
+                            </button>
+                            
+                            {% endif %}
+                           </form>
+                           <div class="mt-2">
+                            <form action="{% url 'add_wishlist' single_product.slug %}" method="post" id="wishlistForm">
+                                {% csrf_token %}
+                                <input type="hidden" name="selected" id="wishlist-Color">
+                                <button type="submit" class="btn btn-outline-primary">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                            </form>
+                           </div>
+                        </article>
+                    
+
+                  
+                </main>
+            </div>
+        </div>
+        <!-- End Product Gallery -->
+
+        <br>
+
+        <!-- Customer Reviews -->
+        <div class="row">
+            <div class="col-md-9">
+                <!-- Review Form -->
+                <form action="{% url 'submit_review' single_product.id %}" method="post">
+                    {% csrf_token %}
+                    <h5>Write Your Review</h5>
+                    <div>
+                        <label>How do you rate this product</label>
+                        <br>
+                        <div class="rate">
+                            <input type="radio" name="rating" id="rating10" value="5" required><label for="rating10" title="5"></label>
+                            <input type="radio" name="rating" id="rating9" value="4.5" required><label for="rating9" title="4.5" class="half"></label>
+                            <input type="radio" name="rating" id="rating8" value="4" required><label for="rating8" title="4"></label>
+                            <!-- Add more rating options as needed -->
+                        </div>
+                        <br>
+                        Review Title:
+                        <input type="text" class="form-control" name="subject">
+                        <br>
+                        Review:
+                        <textarea name="review" rows="4" class="form-control"></textarea>
+                        <br>
+                        {% if user.is_authenticated %}
+                            {% if orderproduct %}
+                                <input type="submit" value="Submit Review" class="btn btn-primary"><br>
+                            {% else %}
+                                <p>You must purchase this product to post a review</p>
+                            {% endif %}
+                        {% else %}
+                            <p>You must be logged in to post a review</p>
+                        {% endif %}
+                    </div>
+                </form>
+                <br>
+
+                <!-- Customer Reviews Section -->
+                <header class="section-heading">
+                    <h3>Customer Reviews</h3>
+                    <span>
+                        <div class="rating-star">
+                            <span>
+                                <i class="fa fa-star{% if single_product.averagereview < 0.5 %}-o{% elif single_product.averagereview >= 0.5 and single_product.averagereview < 1 %}-half-o{% endif %}" aria-hidden="true"></i>
+                                <!-- Repeat for remaining stars -->
+                                <span>{{ single_product.countreview }} review</span>
+                            </span>
+                        </div>
+                    </span>
+                </header>
+
+                <!-- Display Reviews -->
+                <div class="row">
+                    {% for review in reviews %}
+                    <div class="col-md-12">
+                        <div class="review-box">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <h5>{{ review.user.username }}</h5>
+                                </div>
+                                <div class="col-md-10">
+                                    <div class="rating-star">
+                                        <span>
+                                            <!-- Repeat star logic for review rating -->
+                                            <i class="fa fa-star{% if review.rating < 0.5 %}-o{% elif review.rating >= 0.5 and review.rating < 1 %}-half-o{% endif %}" aria-hidden="true"></i>
+                                        </span>
+                                    </div>
+                                    <h5>{{ review.subject }}</h5>
+                                    <p>{{ review.review }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p>No reviews yet</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    var selectedColor = null;
+    var productId = {{ single_product.id }};
+
+    function selectColor(color) {
+        console.log('Selected color:', color);
+        document.getElementById('selected-color').value = color;
+        document.getElementById('wishlist-Color').value=color;
+        sendColorToServer(color, productId);
+    }
+    
+    function sendColorToServer(color, productId) {
+        var data = {
+            'color': color,
+            'product_id': productId,
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        };
+    
+        fetch('{% url "update_selected_color" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': data.csrfmiddlewaretoken
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Response data:', data);
+            if (data.success) {
+                document.getElementById('priceDisplay').innerText = '$' + data.choose_price;
+                document.getElementById('stock').textContent = `${data.choose_stock} pieces left`;
+            }
+        });
+    }
+</script>
+{% endblock %}

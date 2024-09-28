@@ -1,0 +1,34 @@
+<!-- templates/admin_order_requests.html -->
+{% extends "cadmin/base.html" %}
+{% block content %}
+<h2>Manage Cancel/Return Requests</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Order</th>
+            <th>Request Type</th>
+            <th>Reason</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for request in order_requests %}
+        <tr>
+            <td>{{ request.user.username }}</td>
+            <td>{{ request.order.order_number }}</td>
+            <td>{{ request.get_request_type_display }}</td>
+            <td>{{ request.reason }}</td>
+            <td>{{ request.get_status_display }}</td>
+            <td>
+                <a href="{% url 'approve_or_reject_request' request.id 'approve' request.user.id %}">Approve</a> | 
+                <a href="{% url 'approve_or_reject_request' request.id 'reject'  request.user.id %}">Reject</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

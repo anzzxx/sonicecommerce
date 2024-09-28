@@ -1,0 +1,65 @@
+{% extends 'cadmin/base.html' %}
+{% block content %}
+<main>
+    <section class="products">
+        <h2>Variations</h2>
+        <div class="search-bar">
+            <form method="GET" action="">
+                <input type="text" name="query" placeholder="Search" class="search-input" value="{{ request.GET.query }}">
+                <button type="submit" class="search-button">Search</button>
+            </form>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th data-label="Product ID">Product</th>
+                    <th data-label="Category"> Category</th>
+                    <th data-label="Price">Price</th>
+                    <th data-label="Stock">Stock</th>
+                    <th data-label="Available">Available</th>
+                    <th data-label="Available">Defult</th>                   
+                    <th data-label="Image">Variation Value</th>
+                    <th data-label="Options">Options</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for variation in variations %}
+                <tr>
+                    <td data-label="Product ID">{{ variation.product }}</td>
+                    <td data-label="Name">{{ variation.variation_category }}</td>
+                    <td data-label="Category">{{ variation.price }}</td>
+                    <td data-label="Stock">{{ variation.quantity }}</td>
+                    <td data-label="Available">{{ variation.is_active|yesno:"Yes,No" }}</td>
+                    <td data-label="Available">{{ variation.defult|yesno:"Yes,No" }}</td>
+                    <td data-label="Available">{{ variation.variation_value }}</td>
+                    
+                    <td data-label="Options">
+                        <a href="{% url 'variation_toggle_status' variation.pk %}">{% if variation.is_active %}Disable{% else %}Enable{% endif %}</a>
+                        <a href="{% url 'variation_update' variation.pk  %}" class="">Edit</a>
+                    </td>
+                    
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="pagination">
+            <span class="step-links">
+                {% if variations.has_previous %}
+                    <a href="?page=1">&laquo; first</a>
+                    <a href="?page={{ variations.previous_page_number }}">previous</a>
+                {% endif %}
+    
+                <span class="current">
+                    Page {{ variations.number }} of {{ variations.paginator.num_pages }}.
+                </span>
+    
+                {% if variations.has_next %}
+                    <a href="?page={{ variations.next_page_number }}">next</a>
+                    <a href="?page={{ variations.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+        <a href="{% url 'variation_create' %}" class="add-product-btn">Add Variation</a>
+    </section>
+</main>
+{% endblock  %}

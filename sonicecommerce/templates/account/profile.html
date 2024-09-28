@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="profile-sidebar">
+            <div class="profile-image">
+                <img src="profile-image.jpg" alt="Profile Image">
+                <span class="profile-name">David Mark</span>
+            </div>
+            <ul class="profile-nav">
+                <li><a href="#">My cart</a></li>
+                <li><a href="#">Wishlist</a></li>
+                <li><a href="#">Manage address</a></li>
+                <li><a href="#">My orders</a></li>
+                <li><a href="#">Rewards</a></li>
+                <li><a href="#">Logout</a></li>
+            </ul>
+        </div>
+        <div class="profile-main">
+            <div class="profile-details">
+                <h2>Profile</h2>
+                <p><strong>Name:</strong> David Mark</p>
+                <p><strong>Email:</strong> Davidxx@gmail.com</p>
+                <p><strong>Phone:</strong> +76 612345675</p>
+                <p><strong>Birthday:</strong> 20 May 1998</p>
+                <div class="profile-actions">
+                    <button class="btn">Change Password</button>
+                    <button class="btn">Edit Profile</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

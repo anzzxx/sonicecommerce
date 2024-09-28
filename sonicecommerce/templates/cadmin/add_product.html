@@ -1,0 +1,147 @@
+{% extends 'cadmin/base.html' %}
+
+<!-- Include formset management form -->
+{{ formset.management_form }}
+
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Add New Product</h2>
+    <form method="POST" id="image-form" enctype="multipart/form-data" class="shadow p-4 bg-white rounded">
+        {% csrf_token %}
+
+        <!-- Product Form Fields -->
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="{{ product_form.product_name.id_for_label }}">Product Name</label>
+                {{ product_form.product_name}}
+            </div>
+            <div class="form-group col-md-6">
+                <label for="{{ product_form.slug.id_for_label }}">Slug</label>
+                {{ product_form.slug }}
+            </div>
+            <div class="form-group col-md-6">
+                <label for="{{ product_form.category.id_for_label }}">Category</label>
+                {{ product_form.category }}
+            </div>
+         
+            <div class="form-group col-md-6">
+                <label for="{{ product_form.stock.id_for_label }}">stock</label>
+                {{ product_form.stock }}
+            </div>
+         
+            <div class="form-group col-md-6">
+                <label for="{{ product_form.price.id_for_label }}">price</label>
+                {{ product_form.price}}
+            </div>
+         
+            <div class="form-group col-md-6">
+                <label for="{{ product_form.is_available.id_for_label }}">Available</label>
+                {{ product_form.is_available }}
+            </div>
+            <div class="form-group col-md-12">
+                <label for="{{ product_form.image.id_for_label }}">Product Image</label>
+                {{ product_form.image }}
+            </div>
+            <div class="form-group col-md-12">
+                <label for="{{ product_form.description.id_for_label }}">Description</label>
+                {{ product_form.description }}
+            </div>
+        </div>
+
+        <!-- Product Images Formset -->
+        <h3 class="mt-4 mb-3">Additional Product Images</h3>
+        <div class="form-group">
+            {{ formset.management_form }}
+            {% for form in formset.forms %}
+                <div class="form-row mb-3">
+                    <div class="form-group col-md-12">
+                        <label for="{{ form.image.id_for_label }}">Image</label>
+                        {{ form.image }}
+                    </div>
+                    {% if form.instance.pk %}
+                        <div class="form-group col-md-12">
+                            <label for="{{ form.DELETE.id_for_label }}">Delete:</label>
+                            {{ form.DELETE }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Add Product</button>
+    </form>
+
+    <div id="alert-box" class="mt-4"></div>
+    <div class="image-area mt-3 mb-3">
+        <div id="image-box" class="d-flex justify-content-center"></div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const alertBox = document.getElementById('alert-box');
+    const imageBox = document.getElementById('image-box');
+    const imageForm = document.getElementById('image-form');
+    const input = document.getElementById('id_image');
+    const csrf = document.getElementsByName('csrfmiddlewaretoken')[0];
+
+    input.addEventListener('change', () => {
+        alertBox.innerHTML = "";
+        const img_data = input.files[0];
+        const url = URL.createObjectURL(img_data);
+
+        imageBox.innerHTML = `<img src="${url}" id="image" class="img-fluid" style="max-width: 300px;">`;
+
+        const $image = $('#image');
+        $image.cropper({
+            aspectRatio: 2 / 2,
+            viewMode: 2,
+            movable: false,
+            scalable: false,
+            zoomable: false,
+            background: true,
+            crop(event) {
+                // You can use the `event` object to get cropping data if needed
+            }
+        });
+
+        // Handle form submission
+        imageForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const cropper = $image.data('cropper');
+            cropper.getCroppedCanvas({
+                width: 200,  // Smaller canvas size for cropping
+                height: 200
+            }).toBlob((blob) => {
+                const fd = new FormData(imageForm);
+                fd.append('image', blob, 'cropped-image.png');
+
+                $.ajax({
+                    type: 'POST',
+                    url: imageForm.action,
+                    headers: {
+                        'X-CSRFToken': csrf.value
+                    },
+                    data: fd,
+                    contentType: false,
+                    processData: false,
+                    success(response) {
+                        if (response.success) {
+                            alertBox.innerHTML = '<div class="alert alert-success" role="alert">Successfully saved and cropped</div>';
+                            // Redirect or clear form as needed
+                        } else {
+                            alertBox.innerHTML = `<div class="alert alert-danger" role="alert">${response.message || 'Something went wrong...'}</div>`;
+                        }
+                    },
+                    error(error) {
+                        alertBox.innerHTML = '<div class="alert alert-danger" role="alert">Something went wrong...</div>';
+                    }
+                });
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

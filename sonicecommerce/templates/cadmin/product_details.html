@@ -1,0 +1,72 @@
+{% extends 'cadmin/base.html' %}
+{% block content %}
+<main>
+    <section class="products">
+        <h2>Products</h2>
+        <div class="search-bar">
+            <form method="GET" action="">
+                <input type="text" name="query" placeholder="Search" class="search-input" value="{{ request.GET.query }}">
+                <button type="submit" class="search-button">Search</button>
+            </form>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th data-label="Product ID">Product ID</th>
+                    <th data-label="Name">Name</th>
+                    <th data-label="Category">Category</th>
+                    <th data-label="Price">Price</th>
+                    <th data-label="Stock">Stock</th>
+                    <th data-label="Available">Available</th>
+                    <th data-label="Image">Image</th>
+                    <th data-label="Options">Options</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td data-label="Product ID">{{ product.id }}</td>
+                    <td data-label="Name">{{ product.product_name }}</td>
+                    <td data-label="Category">{{ product.category }}</td>
+                    <td data-label="Price">${{ product.price }}</td>
+                    <td data-label="Stock">{{ product.stock }}</td>
+                    <td data-label="Available">{{ product.is_available|yesno:"Yes,No" }}</td>
+                    <td data-label="Image"><img src="{{ product.image.url }}" alt="{{ product.product_name }}" class="product-image"></td>
+                   
+                    <td data-label="Options">
+                      
+                        {% if product.is_available %}
+                        <a href="{% url 'disable_product' product.id %}" class="edit-btn">Disable</a>
+                        <a href="{% url 'edit_product' product.id %}" class="edit-btn">Edit</a>
+                        {% else %}
+                        <a href="{% url 'enable_product' product.id %}" class="edit-btn">Enable</a>
+                        {% endif %}
+                      
+                    </td>
+                    
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="pagination">
+            <span class="step-links">
+                {% if products.has_previous %}
+                    <a href="?page=1">&laquo; first</a>
+                    <a href="?page={{ products.previous_page_number }}">previous</a>
+                {% endif %}
+        
+                <span class="current">
+                    Page {{ products.number }} of {{ products.paginator.num_pages }}.
+                </span>
+        
+                {% if products.has_next %}
+                    <a href="?page={{ products.next_page_number }}">next</a>
+                    <a href="?page={{ products.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+        
+        <a href="{% url 'add_product' %}" class="add-product-btn">Add Product</a>
+    </section>
+</main>
+{% endblock  %}

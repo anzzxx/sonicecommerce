@@ -1,0 +1,101 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #1E1E1E;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    display: flex;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-sidebar {
+    width: 30%;
+    background-color: #E3E9FF;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.profile-image {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.profile-image img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.profile-name {
+    display: block;
+    margin-top: 10px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.profile-nav {
+    list-style-type: none;
+    padding: 0;
+}
+
+.profile-nav li {
+    margin: 10px 0;
+}
+
+.profile-nav a {
+    text-decoration: none;
+    color: #333;
+    font-size: 18px;
+    display: block;
+    padding: 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.profile-nav a:hover {
+    background-color: #ccc;
+}
+
+.profile-main {
+    width: 70%;
+    padding: 20px;
+}
+
+.profile-details {
+    background-color: #E3E9FF;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.profile-details h2 {
+    margin-top: 0;
+}
+
+.profile-actions {
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #333;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #555;
+}

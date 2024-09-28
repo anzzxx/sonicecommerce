@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Cancel Order - {{ order.order_number }}</h2>
+    <p>Are you sure you want to cancel this order?</p>
+    <form method="post" action="{% url 'cancel_order' order.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, Cancel Order</button>
+        <a href="{% url 'order_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

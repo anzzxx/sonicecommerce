@@ -1,0 +1,255 @@
+{% extends 'cadmin/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Dashboard Stats -->
+    <div class="row">
+        <!-- Top Selling Category -->
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-info shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title mb-0">{{top_selling_category_name}}</h5>
+                            <small>Items Sold: <span>{{top_selling_category_count}}</span></small>
+                        </div>
+                        <i class="fas fa-tags fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Total Stock -->
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-success shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title mb-0"><span id="total-stock">{{product_count}}</span> Items</h5>
+                            <small>Total Stock</small>
+                        </div>
+                        <i class="fas fa-boxes fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Orders -->
+        <div class="col-md-3 mb-4">
+            <div class="card text-dark bg-warning shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title mb-0"><span id="total-count">{{order_count}}</span></h5>
+                            <small>Total Orders</small>
+                        </div>
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Sales Amount -->
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-danger shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title mb-0">$<span id="sale-amount">{{total_sale_amount|floatformat:2}}</span></h5>
+                            <small>Total Sales</small>
+                        </div>
+                        <i class="fas fa-money-bill-wave fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sales Charts -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h6 class="font-weight-bold text-primary"><i class="fas fa-chart-bar"></i> Sales Overview</h6>
+                    <!-- Year and Month Selector -->
+                    <div>
+                        <select id="timePeriod" class="form-control">
+                            <option value="year">Year</option>
+                            <option value="month" selected>Month</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-body mt-5">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-white">
+                    <h6 class="font-weight-bold text-primary"><i class="fas fa-chart-pie"></i> Order Details</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="salesDoughnutChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Best Selling Products Table -->
+    <div class="card-body col-md-12">
+      
+        <table border="1" cellspacing="0" cellpadding="8">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Product Name</th>
+                    <th>Total Quantity Sold</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in best_selling_products %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ product.product__product_name }}</td>
+                    <td>{{ product.total_quantity_sold }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    
+    </div>
+</div>
+
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Function to update the sales chart based on selected period (year or month)
+    document.getElementById('timePeriod').addEventListener('change', function() {
+        const selectedValue = this.value;
+        updateSalesChart(selectedValue);
+    });
+
+    // Function to fetch sales data dynamically
+    function updateSalesChart(period) {
+        fetch(`/cadmin/get_sales_data/${period}/`)  // Updated URL path
+            .then(response => response.json())
+            .then(data => {
+                const labels = data.labels;
+                const salesData = data.data;
+
+                // Destroy the old chart and create a new one
+                salesChart.destroy();
+
+                var ctx = document.getElementById('salesChart').getContext('2d');
+                salesChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: period === 'year' ? 'Yearly Sales' : 'Monthly Sales',
+                            data: salesData,
+                            backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching sales data:', error));
+    }
+
+    // Initialize with monthly chart by default
+    var ctx = document.getElementById('salesChart').getContext('2d');
+    var salesChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'Monthly Sales',
+                data: [1200, 1500, 1800, 1700, 1600, 1900, 2200],
+                backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    // Doughnut chart for order status
+    var ctxDoughnut = document.getElementById('salesDoughnutChart').getContext('2d');
+    var salesDoughnutChart = new Chart(ctxDoughnut, {
+        type: 'doughnut',
+        data: {
+            labels: ['New Order        ', 'Cancelled Order', 'Shipped Order   ', 'Delivered Order '],
+            datasets: [{
+                label: 'Order Status',
+                data: [{{ new_order }}, {{ cancelled_order }}, {{ shipped_order }}, {{ delivered_order }}],
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.7)',
+                    'rgba(255, 99, 132, 0.7)',
+                    'rgba(255, 206, 86, 0.7)',
+                    'rgba(75, 192, 192, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            return tooltipItem.label + ': ' + tooltipItem.raw;
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+
+<style>
+    .chart-container {
+        position: relative;
+        width: 100%;
+        height: 250px;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'cadmin/base.html' %}
+
+{% block content %}
+<main>
+    <h2>Users</h2>
+    <div class="search-bar">
+        <form method="GET" action="">
+            <input type="text" name="query" placeholder="Search" class="search-input" value="{{ request.GET.query }}">
+            <button type="submit" class="search-button">Search</button>
+        </form>
+    </div>
+    
+    <table border="1" cellspacing="0" cellpadding="8">
+        <thead>
+            <tr>
+                <th>User ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Options</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.first_name }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.phone_number }}</td>
+                <td>
+                    {% if user.is_active %}
+                        <a href="{% url 'block_user' user.id %}">Block</a>
+                    {% else %}
+                        <a href="{% url 'unblock_user' user.id %}">Unblock</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Pagination controls -->
+    <div class="pagination">
+        <span class="step-links">
+            {% if users.has_previous %}
+                <a href="?page=1">&laquo; first</a>
+                <a href="?page={{ users.previous_page_number }}">previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ users.number }} of {{ users.paginator.num_pages }}.
+            </span>
+
+            {% if users.has_next %}
+                <a href="?page={{ users.next_page_number }}">next</a>
+                <a href="?page={{ users.paginator.num_pages }}">last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+</main>
+{% endblock %}
+

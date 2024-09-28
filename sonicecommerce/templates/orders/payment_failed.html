@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+<body>
+
+    <div class="container">
+        <h1>Payment Failed</h1>
+        <p>Unfortunately, your payment was not successful. Please try again or contact customer support if the issue persists.</p>
+        
+        <a href="{% url 'place_order' %}" class="retry-button">Try Again</a>
+    </div>
+
+</body>
+<style>
+    .container {
+        text-align: center;
+        padding: 50px;
+    }
+
+    h1 {
+        color: #d9534f; /* Red color for failure */
+    }
+
+    p {
+        font-size: 18px;
+    }
+
+    .retry-button {
+        background-color: #5bc0de; /* Light blue */
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 16px;
+        margin-top: 20px;
+        display: inline-block;
+    }
+
+    .retry-button:hover {
+        background-color: #31b0d5;
+    }
+</style>
+{% endblock %}

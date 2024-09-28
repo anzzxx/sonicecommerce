@@ -1,0 +1,79 @@
+{% extends 'cadmin/base.html' %}
+{% block content %}
+<body>
+   
+     
+    <main>
+       
+            <h2>Categories</h2>
+            <div class="search-bar">
+                <form method="GET" action="">
+                    <input type="text" name="query" placeholder="Search" class="search-input" value="{{ request.GET.query }}">
+                    <button type="submit" class="search-button">Search</button>
+                </form>
+            </div>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Offer Type</th>
+                        <th>Category</th>
+                        <th>Product</th>
+                        <th>Discount percentage</th>
+                        <th>Valid From</th>
+                        <th>Valid To</th>
+                        <th>Is Active</th>
+                        <th>Option</th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for offer in offers %}
+                    <tr>
+                        <td>{{ offer.offer_type }}</td>
+                        <td>{{ offer.category }}</td>
+                        <td>+{{ offer.product }}</td>
+                        <td>{{ offer.percentage }}</td>
+                        <td>{{ offer.valid_from }}</td>
+                        <td>{{ offer.valid_to }}</td>
+                        <td>{{ offer.is_active }}</td>
+                       
+                        <td>
+                            <div class="button-container">
+                                <a href="{% url 'edit_offer' offer_id=offer.id %}" >Edit</a>
+                                {% if offer.is_active %}
+                                <a href="{% url 'toggle_offer_status' offer.id %}" class="#">Deactivate</a>
+                               {% else %}
+                                <a href="{% url 'toggle_offer_status' offer.id %}" class="#">Activate</a>
+                               {% endif %}
+                            </div>
+                            
+                            
+                          
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="pagination">
+                <span class="step-links">
+                    {% if offers.has_previous %}
+                        <a href="?page=1">&laquo; first</a>
+                        <a href="?page={{ offers.previous_page_number }}">previous</a>
+                    {% endif %}
+        
+                    <span class="current">
+                        Page {{ offers.number }} of {{ offers.paginator.num_pages }}.
+                    </span>
+        
+                    {% if offers.has_next %}
+                        <a href="?page={{ offers.next_page_number }}">next</a>
+                        <a href="?page={{ offers.paginator.num_pages }}">last &raquo;</a>
+                    {% endif %}
+                </span>
+            </div>
+            <a href="{% url 'add_offer' %}" class="add-product-btn">Add Offer</a>
+     
+    </main>
+
+</body>
+{% endblock %}

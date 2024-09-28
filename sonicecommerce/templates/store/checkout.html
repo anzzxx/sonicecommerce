@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<section class="section-content padding-y bg">
+    <div class="container">
+        <div class="row">
+            <!-- Address Section -->
+            <aside class="col-lg-6">
+                <div class="col-md-12">
+                    {% if address %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    Address
+                                    {% if address.is_primary %}
+                                        <span class="badge bg-success">Primary</span>
+                                    {% endif %}
+                                </h5>
+                                <p class="mb-1"><strong>Address Line 1:</strong> {{ address.address_line_1 }}</p>
+                                {% if address.address_line_2 %}
+                                    <p class="mb-1"><strong>Address Line 2:</strong> {{ address.address_line_2 }}</p>
+                                {% endif %}
+                                <p class="mb-1"><strong>Postal Code:</strong> {{ address.postal_code }}</p>
+                                <p class="mb-1"><strong>Phone 1:</strong> {{ address.phone_primary }}</p>
+                                <p class="mb-1"><strong>Phone 2:</strong> {{ address.phone_secondery }}</p>
+                                <p class="mb-1"><strong>City:</strong> {{ address.city }}</p>
+                                <p class="mb-1"><strong>State:</strong> {{ address.state }}</p>
+                                <p class="mb-1"><strong>Country:</strong> {{ address.country }}</p>
+                                <div class="d-flex justify-content-between mt-3">
+                                    <a href="{% url 'change_address' %}" class="btn btn-primary btn-sm">Change</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p>No address found.</p>
+                        <a href="{% url 'add_address' %}?next={% url 'checkout' %}">Add new address</a>
+
+                    {% endif %}
+                </div>
+            </aside>
+            
+            <!-- Cart Section -->
+            <aside class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table table-borderless table-shopping-cart">
+                            <thead class="text-muted">
+                                <tr class="small text-uppercase">
+                                    <th scope="col">Product</th>
+                                    <th scope="col" width="120">Quantity</th>
+                                    <th scope="col" width="120">Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cart_item in cart_items %}
+                                    <tr>
+                                        <td>
+                                            <figure class="itemside align-items-center">
+                                                <div class="aside"><img src="{{ cart_item.product.image.url }}" class="img-sm"></div>
+                                                <figcaption class="info">
+                                                    <a href="{{ cart_item.product.get_url }}" class="title text-dark">{{ cart_item.product.product_name }}</a>
+                                                    <p class="text-muted small">
+                                                        {% if cart_item.variation.all %}
+                                                            {% for item in cart_item.variation.all %}
+                                                                {{ item.variation_category | capfirst }} : {{ item.variation_value | capfirst }} <br>
+                                                            {% endfor %}
+                                                        {% endif %}
+                                                    </p>
+                                                </figcaption>
+                                            </figure>
+                                        </td>
+                                        <td>
+                                            <label for="">{{ cart_item.quantity }}</label>
+                                        </td>
+                                        <td>
+                                            <div class="price-wrap">
+                                                {% if cart_item.discounted_price %}
+                                                    <var class="price">${{ cart_item.total_price | floatformat:2 }}</var>
+                                                    <small class="text-muted"><span>${{ cart_item.discounted_price | floatformat:2 }}</span> each</small>
+                                                {% else %}
+                                                    <var class="price">${{ cart_item.total_price | floatformat:2 }}</var>
+                                                    <small class="text-muted">${{ cart_item.variation.all.0.price }} each</small>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <div class="mt-3">
+                            <a href="{% url 'storepage' %}" class="btn btn-light btn-block">Continue Shopping</a>
+                            <a href="{% url 'place_order' %}" class="btn btn-primary btn-block">Place Order</a>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div> <!-- row.// -->
+    </div> <!-- container .// -->
+</section>
+{% endblock %}

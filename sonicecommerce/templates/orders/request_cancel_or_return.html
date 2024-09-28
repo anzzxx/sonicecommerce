@@ -1,0 +1,39 @@
+<!-- templates/request_cancel_or_return.html -->
+{% extends "base.html" %}
+{% block content %}
+<h2>Request {{ order.get_status_display }}</h2>
+
+<!-- Add margin around the form using Bootstrap m-4 class -->
+<form method="post" class="m-4">
+    {% csrf_token %}
+
+    <!-- Request Type Field -->
+    <div class="form-group">
+        <label for="request_type">Request Type</label>
+        {{ form.request_type }}
+        {% if form.request_type.help_text %}
+        <small class="form-text text-muted">{{ form.request_type.help_text }}</small>
+        {% endif %}
+        {% if form.request_type.errors %}
+        <small class="text-danger">{{ form.request_type.errors }}</small>
+        {% endif %}
+    </div>
+
+    <!-- Reason Field -->
+    <div class="form-group">
+        <label for="reason">Reason</label>
+        {{ form.reason }}
+        {% if form.reason.help_text %}
+        <small class="form-text text-muted">{{ form.reason.help_text }}</small>
+        {% endif %}
+        {% if form.reason.errors %}
+        <small class="text-danger">{{ form.reason.errors }}</small>
+        {% endif %}
+    </div>
+
+    <!-- Submit Button -->
+    <button type="submit" class="btn btn-primary">Submit Request</button>
+</form>
+
+<a href="{% url 'order_details' order.order_number %}" class="btn btn-secondary mt-3 m-4">Back to Order Details</a>
+{% endblock %}

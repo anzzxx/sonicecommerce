@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="section-conten padding-y bg">
+{% include "includes/alerts.html" %}
+    <div class="container">
+        <div class="row">
+      
+        <main class="col-md-12">
+            <article class="card">
+            <header class="card-header d-flex justify-content-between align-items-center">
+                <strong class="d-inline-block">Your Order History</strong>
+                <span>{{user.first_name}}</span>
+            </header>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12 d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Addresses</h5>
+                        <!-- Add Address Button moved to the top-right corner -->
+                        <a href="{% url 'add_address'  %}" class="btn btn-primary">Add Address</a>
+                    </div>
+                </div>
+                <hr> <!-- Separate header from the address list -->
+
+                <div class="row"> 
+                    <div class="col-md-12">
+                        {% for i in address %}
+                            <div class="address-details mb-3">
+                                <p class="mb-0"><strong>Address Line 1:</strong> {{ i.address_line_1 }}</p>
+                                {% if i.address_line_2 %}
+                                    <p class="mb-0"><strong>Address Line 2:</strong> {{ i.address_line_2 }}</p>
+                                {% endif %}
+                                <p class="mb-0"><strong>City:</strong> {{ i.city }}</p>
+                                <p class="mb-0"><strong>State:</strong> {{ i.state }}</p>
+                                <p class="mb-0"><strong>Country:</strong> {{ i.country }}</p>
+                                <p class="mb-0"><strong>Postal Code:</strong> {{ i.postal_code }}</p>
+                                
+                                <!-- Edit and Delete Buttons -->
+                                <div class="mt-2">
+                                    <a  class="btn btn-primary" href="{% url 'select_address' address_id=i.id %}" class="btn btn-sm btn-warning">Choose This</a>
+                                    
+                                </div>
+                                
+                            </div>
+                            {% if not forloop.last %}
+                                <hr> <!-- Add a horizontal line between addresses -->
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div> <!-- row.// -->
+            </div> <!-- card-body .// -->
+            
+            </article> <!-- order-group.// --> 
+        </main>
+    </div> <!-- row.// -->
+    </div>
+</section>
+{% endblock %}

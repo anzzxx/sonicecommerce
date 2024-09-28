@@ -1,0 +1,137 @@
+
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.sidebar {
+    width: 250px;
+    background: #333;
+    color: white;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    padding: 20px;
+}
+
+.sidebar h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    margin: 20px 0;
+}
+
+.sidebar ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+.container {
+    margin-left: 270px;
+    padding: 20px;
+}
+
+header h1 {
+    margin-bottom: 20px;
+}
+
+.metrics {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.metric {
+    background: #f4f4f4;
+    padding: 20px;
+    border-radius: 8px;
+    width: 32%;
+    display: flex;
+    align-items: center;
+}
+
+.metric i {
+    font-size: 24px;
+    margin-right: 10px;
+}
+
+.charts {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.chart {
+    background: #f4f4f4;
+    padding: 20px;
+    border-radius: 8px;
+    width: 48%;
+    margin-bottom: 20px;
+}
+
+.chart canvas {
+    width: 100%;
+    height: 250px;
+}
+
+.chart ul {
+    padding: 0;
+    list-style: none;
+}
+
+.chart ul li {
+    margin: 5px 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .metrics {
+        flex-direction: column;
+    }
+
+    .metric {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .charts {
+        flex-direction: column;
+    }
+
+    .chart {
+        width: 100%;
+    }
+
+    .container {
+        margin-left: 0;
+        padding: 20px;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+
+    .sidebar ul {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    .sidebar ul li {
+        margin: 10px 0;
+        width: 32%;
+    }
+}

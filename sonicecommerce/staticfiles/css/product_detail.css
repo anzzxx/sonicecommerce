@@ -1,0 +1,47 @@
+/* CSS for sub-images in small-wrap */
+.img-small-wrap {
+    display: flex;
+    justify-content: center; /* Center the items horizontally */
+    gap: 10px; /* Adjust the spacing between items */
+    overflow-x: auto; /* Allow horizontal scrolling if necessary */
+    margin-top: 10px;
+}
+
+.img-small-wrap .item-gallery {
+    flex: 0 0 auto; /* Prevent items from growing or shrinking */
+}
+
+.img-small-wrap .item-gallery img {
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+    width: 100px; /* Set a fixed width for consistency */
+    height: auto; /* Maintain aspect ratio */
+    border-radius: 5px; /* Add rounded corners for a cleaner look */
+}
+
+.img-small-wrap .item-gallery img:hover {
+    transform: scale(1.1); /* Enlarge slightly on hover */
+}
+
+.color-options {
+    display: flex;
+    gap: 10px;
+}
+
+.color-swatch {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 0 2px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease;
+}
+
+.color-swatch:hover {
+    transform: scale(1.1);
+}
+
+.color-swatch.active {
+    border: 2px solid #000;
+}

@@ -1,0 +1,75 @@
+{% extends 'cadmin/base.html' %}
+{% block content %}
+<body>
+  
+     
+        
+            
+                <h2>Coupons</h2>
+                <div class="search-bar">
+                    <form method="GET" action="">
+                        <input type="text" name="query" placeholder="Search" class="search-input" value="{{ request.GET.query }}">
+                        <button type="submit" class="search-button">Search</button>
+                    </form>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th data-label="Coupon ID">Coupon ID</th>
+                            <th data-label="Code">Code</th>
+                            <th data-label="vaild_from">vaild from</th>
+                            <th data-label="valid_to">Valid to</th>
+                            <th data-label="amount_discount">Discount</th>
+                            <th data-label="is_active">Active status</th>
+                            <th data-label="created at">created at</th>
+                            <th data-label="updated at">updated at</th>
+                            <th data-label="Options">Options</th>
+                        </tr>
+                    </thead>
+                    
+                        {% for coupon in coupons %}
+                        <tr>
+                            <td data-label="Coupon ID">{{ coupon.id }}</td>
+                            <td data-label="Code">{{ coupon.code }}</td>
+                            <td data-label="vaild_from">{{ coupon.valid_from }}</td>
+                            <td data-label="valid_to">{{ coupon.valid_to }}</td>
+                            <td data-label="amount_discount">${{ coupon.discount_amount }}</td>
+                           
+                            <td data-label="created at">{{ coupon.is_active|yesno:"Yes,No" }}</td>
+                            <td data-label="is_active">{{ coupon.created_at }}</td>
+                            <td data-label="updated at">{{ coupon.updated_at }}</td>
+                            <td data-label="Options">
+                             
+                                <br>
+                              
+                                <a href="{% url 'delete_coupon' id=coupon.id %}" class="btn btn-danger">Delete</a>
+
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+                <div class="pagination">
+                    <span class="step-links">
+                        {% if coupons.has_previous %}
+                            <a href="?page=1">&laquo; first</a>
+                            <a href="?page={{ coupons.previous_page_number }}">previous</a>
+                        {% endif %}
+            
+                        <span class="current">
+                            Page {{ coupons.number }} of {{ coupons.paginator.num_pages }}.
+                        </span>
+            
+                        {% if coupons.has_next %}
+                            <a href="?page={{ coupons.next_page_number }}">next</a>
+                            <a href="?page={{ coupons.paginator.num_pages }}">last &raquo;</a>
+                        {% endif %}
+                    </span>
+                </div>
+                <a href="{% url 'add_coupon' %}" class="add-product-btn">Add Coupon</a>
+            
+        
+    
+
+{% endblock %}

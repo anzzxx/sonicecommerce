@@ -1,0 +1,172 @@
+{% extends 'cadmin/base.html' %}
+
+{% block content %}
+
+<h2 class="mb-4">Sale Report</h2>
+
+<!-- Date Input, Dropdown, and Submit Button Row -->
+<form method="GET" action="{% url 'sale_report' %}">
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <label for="startDate">Start Date:</label>
+            <input type="date" id="startDate" name="startDate" class="form-control" value="{{ start_date }}">
+        </div>
+        <div class="col-md-3">
+            <label for="endDate">End Date:</label>
+            <input type="date" id="endDate" name="endDate" class="form-control" value="{{ end_date }}">
+        </div>
+        <div class="col-md-3">
+            <label for="periodType">Period Type:</label>
+            <select id="periodType" name="periodType" class="form-control">
+                <option value="">Select period</option>
+                <option value="day" {% if period_type == 'day' %}selected{% endif %}>Day</option>
+                <option value="week" {% if period_type == 'week' %}selected{% endif %}>Week</option>
+                <option value="month" {% if period_type == 'month' %}selected{% endif %}>Month</option>
+            </select>
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">Submit</button>
+        </div>
+    </div>
+</form>
+<div class="row">
+    <!-- Cod Sale -->
+    <div class="col-md-3 mb-4">
+        <div class="card text-dark ">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title mb-0">$<span id="total-sale">{{overall_discount|floatformat:2}}</span></h5>
+                        <small>Overall discount</small>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Overall Orders -->
+    <div class="col-md-3 mb-4">
+        <div class="card text-dark ">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title mb-0"><span id="total-count">{{overall_sales_count}}</span></h5>
+                        <small>Total Orders</small>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Overall Sale Amount -->
+    <div class="col-md-3 mb-4">
+        <div class="card text-dark">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title mb-0">$<span id="sale-amount">{{overall_amount|floatformat:2}}</span></h5>
+                        <small>Total Sales</small>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card text-dark">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title mb-0">$<span id="sale-amount">{{overall_coupon|floatformat:2}}</span></h5>
+                        <small>Total Coupon Discount</small>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<!-- Order Table -->
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Order Number</th>
+                <th>Customer</th>
+                <th>Order Total</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Coupon</th>
+                <th>Total Discount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order_discount in order_discounts %}
+            <tr>
+                <td>{{ order_discount.order.order_number }}</td>
+                <td>{{ order_discount.order.full_name }}</td>
+                <td>${{ order_discount.order.order_total|floatformat:2 }}</td>
+                <td>{{ order_discount.order.created_at }}</td>
+                <td>{{ order_discount.order.status }}</td>
+                <td>{{ order_discount.order.coupon }}</td>
+                <td>${{ order_discount.total_discount|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7">No orders found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Pagination Controls -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {% if orders.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?startDate={{ start_date }}&endDate={{ end_date }}&periodType={{ period_type }}&page=1" aria-label="First">
+                    <span aria-hidden="true">&laquo;&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?startDate={{ start_date }}&endDate={{ end_date }}&periodType={{ period_type }}&page={{ orders.previous_page_number }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% endif %}
+
+            {% for num in orders.paginator.page_range %}
+                {% if orders.number == num %}
+                <li class="page-item active" aria-current="page"><span class="page-link">{{ num }}<span class="sr-only">(current)</span></span></li>
+                {% else %}
+                <li class="page-item"><a class="page-link" href="?startDate={{ start_date }}&endDate={{ end_date }}&periodType={{ period_type }}&page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if orders.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?startDate={{ start_date }}&endDate={{ end_date }}&periodType={{ period_type }}&page={{ orders.next_page_number }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?startDate={{ start_date }}&endDate={{ end_date }}&periodType={{ period_type }}&page={{ orders.paginator.num_pages }}" aria-label="Last">
+                    <span aria-hidden="true">&raquo;&raquo;</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="mb-4">
+        <a href="{% url 'download_excel' %}?startDate={{ start_date }}&endDate={{ end_date }}&periodType={{ period_type }}" class="btn btn-success">Download Excel</a>
+        <a href="{% url 'download_pdf' %}?startDate={{ start_date }}&endDate={{ end_date }}&periodType={{ period_type }}" class="btn btn-danger">Download PDF</a>
+    </div>
+</div>
+
+{% endblock %}

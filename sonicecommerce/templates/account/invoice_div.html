@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice - {{order.order_number}}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 15px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #007bff;
+        }
+        .header p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+        .invoice-from, .invoice-details {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .invoice-from h2, .invoice-details h2 {
+            margin-top: 0;
+            font-size: 18px;
+            border-bottom: 1px solid #007bff;
+            padding-bottom: 5px;
+        }
+        .invoice-from ul, .invoice-details ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .invoice-from li, .invoice-details li {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .invoice-items {
+            margin-bottom: 15px;
+        }
+        .invoice-items table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        .invoice-items th, .invoice-items td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        .invoice-items th {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .invoice-footer {
+            text-align: center;
+            margin-top: 15px;
+        }
+        .invoice-footer p {
+            margin: 0;
+            font-size: 14px;
+            color: #555;
+        }
+        .text-right {
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Invoice</h1>
+            <p>Order #{{order.order_number}}</p>
+        </div>
+
+        <div class="invoice-from">
+            <h2>Invoiced To</h2>
+            <ul>
+                <li><strong>{{order.full_name}}</strong></li>
+                <li>{{order.full_address}}</li>
+                <li>{{order.city}}, {{order.state}}</li>
+                <li>{{order.country}}</li>
+            </ul>
+        </div>
+
+        <div class="invoice-details">
+            <h2>Order Details</h2>
+            <ul>
+                <li><strong>Order Date:</strong> {{order.created_at}}</li>
+                <li><strong>Transaction ID:</strong> {{order.payment.payment_id}}</li>
+                <li><strong>Status:</strong> {{order.payment.status}}</li>
+            </ul>
+        </div>
+
+        <div class="invoice-items">
+            <h2>Items</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Qty</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order_detail %}
+                    <tr>
+                        <td>
+                            {{item.product.product_name}}
+                            {% if item.variation.all %}
+                                <p class="text-muted small">
+                                    {% for i in item.variation.all %}
+                                    {{i.variation_category | capfirst}} : {{i.variation_value | capfirst}} <br>
+                                    {% endfor %}
+                                </p>
+                            {% endif %}
+                        </td>
+                        <td>{{item.quantity}}</td>
+                        <td>${{item.product_price}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="2" class="text-right">Sub Total:</th>
+                        <th>${{sub_total}}</th>
+                    </tr>
+                    <tr>
+                        <th colspan="2" class="text-right">Tax:</th>
+                        <th>${{order.tax}}</th>
+                    </tr>
+                    <tr>
+                        <th colspan="2" class="text-right">Grand Total:</th>
+                        <th>${{order.order_total}}</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="invoice-footer">
+            <p>Thank you for shopping with us!</p>
+        </div>
+    </div>
+</body>
+</html>
+

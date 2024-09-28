@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="section-content padding-y">
+
+    <!-- ============================ COMPONENT REGISTER   ================================= -->
+    <div class="card mx-auto" style="max-width:520px; margin-top:40px;">
+        <article class="card-body">
+            {% include "includes/alerts.html" %}
+            <header class="mb-4"><h4 class="card-title">Sign up</h4></header>
+            <form id="signupForm" action="{% url 'register' %}" method="post" onsubmit="return validateSignupForm()">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="col form-group">
+                        <label>First name</label>
+                        {{ form.first_name }}
+                        <div id="firstNameError" class="text-danger"></div>
+                        {{ form.first_name.errors }}
+                    </div> <!-- form-group end.// -->
+                    <div class="col form-group">
+                        <label>Last name</label>
+                        {{ form.last_name }}
+                        <div id="lastNameError" class="text-danger"></div>
+                        {{ form.last_name.errors }}
+                    </div> <!-- form-group end.// -->
+                </div> <!-- form-row end.// -->
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Email</label>
+                        {{ form.email }}
+                        <div id="emailError" class="text-danger"></div>
+                        {{ form.email.errors }}
+                    </div> <!-- form-group end.// -->
+                    <div class="form-group col-md-6">
+                        <label>Phone</label>
+                        {{ form.phone_number }}
+                        <div id="phoneError" class="text-danger"></div>
+                        {{ form.phone_number.errors }}
+                    </div> <!-- form-group end.// -->
+                </div> <!-- form-row.// -->
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Create password</label>
+                        {{ form.password }}
+                        <div id="passwordError" class="text-danger"></div>
+                        {{ form.password.errors }}
+                    </div> <!-- form-group end.// --> 
+                    <div class="form-group col-md-6">
+                        <label>Confirm password</label>
+                        {{ form.confirm_password }}
+                        <div id="confirmPasswordError" class="text-danger"></div>
+                        {{ form.confirm_password.errors }}
+                    </div> <!-- form-group end.// -->  
+                </div> <!-- form-row.// -->
+                {{ form.non_field_errors }}
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-block">Register</button>
+                </div> <!-- form-group// -->      
+            </form>
+        </article><!-- card-body.// -->
+    </div> <!-- card .// -->
+    <p class="text-center mt-4">Have an account? <a href="{% url 'login' %}">Log In</a></p>
+    <br><br>
+    <!-- ============================ COMPONENT REGISTER  END.// ================================= -->
+</section>
+
+<script>
+    function validateSignupForm() {
+        // Clear previous errors
+        clearErrors();
+
+        const firstName = document.getElementById("id_first_name").value;
+        const lastName = document.getElementById("id_last_name").value;
+        const email = document.getElementById("id_email").value;
+        const phone = document.getElementById("id_phone_number").value;
+        const password = document.getElementById("id_password").value;
+        const confirmPassword = document.getElementById("id_confirm_password").value;
+
+        let isValid = true;
+
+        if (firstName === "") {
+            displayError("firstNameError", "Please enter your first name.");
+            isValid = false;
+        }
+        if (lastName === "") {
+            displayError("lastNameError", "Please enter your last name.");
+            isValid = false;
+        }
+        if (email === "") {
+            displayError("emailError", "Please enter your email.");
+            isValid = false;
+        } else if (!validateEmail(email)) {
+            displayError("emailError", "Please enter a valid email address.");
+            isValid = false;
+        }
+        if (phone === "") {
+            displayError("phoneError", "Please enter your phone number.");
+            isValid = false;
+        } else if (!validatePhoneNumber(phone)) {
+            displayError("phoneError", "Please enter a valid phone number.");
+            isValid = false;
+        }
+        if (password === "") {
+            displayError("passwordError", "Please enter a password.");
+            isValid = false;
+        } else if (!isStrongPassword(password)) {
+            displayError("passwordError", "Password must be at least 8 characters long and include uppercase letters, lowercase letters, numbers, and special characters.");
+            isValid = false;
+        }
+        if (confirmPassword === "") {
+            displayError("confirmPasswordError", "Please confirm your password.");
+            isValid = false;
+        } else if (password !== confirmPassword) {
+            displayError("confirmPasswordError", "Passwords do not match.");
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+
+    function validatePhoneNumber(phone) {
+        const re = /^\+?[1-9]\d{1,14}$/;
+        return re.test(phone);
+    }
+
+    function isStrongPassword(password) {
+        const minLength = 8;
+        const hasUpperCase = /[A-Z]/.test(password);
+        const hasLowerCase = /[a-z]/.test(password);
+        const hasNumbers = /[0-9]/.test(password);
+        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+        return password.length >= minLength && hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChar;
+    }
+
+    function clearErrors() {
+        document.getElementById("firstNameError").textContent = "";
+        document.getElementById("lastNameError").textContent = "";
+        document.getElementById("emailError").textContent = "";
+        document.getElementById("phoneError").textContent = "";
+        document.getElementById("passwordError").textContent = "";
+        document.getElementById("confirmPasswordError").textContent = "";
+    }
+
+    function displayError(elementId, message) {
+        document.getElementById(elementId).textContent = message;
+    }
+</script>
+
+{% endblock %}
+

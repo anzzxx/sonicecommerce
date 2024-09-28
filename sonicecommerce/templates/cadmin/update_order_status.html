@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Update Order Status - {{ order.order_number }}</h2>
+    <form method="post" action="{% url 'update_order_status' order.id %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="status">Order Status</label>
+            <select id="status" name="status" class="form-control">
+                <option value="New" {% if order.status == 'New' %}selected{% endif %}>New</option>
+                <option value="Accepted" {% if order.status == 'Accepted' %}selected{% endif %}>Accepted</option>
+                <option value="Completed" {% if order.status == 'Completed' %}selected{% endif %}>Completed</option>
+                <option value="Cancelled" {% if order.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Status</button>
+    </form>
+</div>
+{% endblock %}
+

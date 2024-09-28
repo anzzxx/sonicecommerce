@@ -1,0 +1,11 @@
+{% extends "cadmin/base.html" %}
+
+{% block content %}
+  <h2>Edit Offer</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Update Offer</button>
+    <a href="{% url 'offer_view' %}" class="btn btn-secondary">Cancel</a>  <!-- Replace with the actual URL name -->
+  </form>
+{% endblock %}

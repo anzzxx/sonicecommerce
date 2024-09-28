@@ -1,0 +1,78 @@
+{% extends 'cadmin/base.html' %}
+
+{% block content %}
+
+    <h2 class="mb-4 mt-3">Order List</h2>
+    <div class="search-bar">
+        <form method="GET" action="">
+            <input type="text" name="query" placeholder="Search" class="search-input" value="{{ request.GET.query }}">
+            <button type="submit" class="search-button">Search</button>
+        </form>
+    </div>
+    
+    <!-- Responsive table wrapper -->
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Order Number</th>
+                    <th>Customer</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>City</th>
+                    <th>Order Total</th>
+                    <th>Tax</th>
+                    <th>Is Ordered</th>
+                    <th>Status</th>
+                    <th>Created At</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <th scope="row"><a href="{% url 'cadmin_order_details' order.order_number %}">{{order.order_number}}</a></th>
+                    <td>{{ order.full_name }}</td>
+                    <td>+{{ order.phone }}</td>
+                    <td>{{ order.email }}</td>
+                    <td>{{ order.city }}</td>
+                    <td>{{ order.order_total }}</td>
+                    <td>{{ order.tax }}</td>
+                    <td>{{ order.is_orderd }}</td>
+                    <td>{{ order.status }}</td>
+                    <td>{{ order.updated_at }}</td>
+                    <td>
+                        <div class="button-container">
+                            <a href="{% url 'change_order_status' order.order_number 'Accepted' %}" >Accepted</a>
+                            <a href="{% url 'change_order_status' order.order_number 'Shipped' %}" >Shipped</a>
+                            <a href="{% url 'change_order_status' order.order_number 'Deliverd' %}" >Delivered</a>
+                            <a href="{% url 'change_order_status' order.order_number 'Cancelled' %}" >Cancelled</a>
+                        </div>
+                        
+                        
+                      
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="pagination">
+            <span class="step-links">
+                {% if orders.has_previous %}
+                    <a href="?page=1">&laquo; first</a>
+                    <a href="?page={{ orders.previous_page_number }}">previous</a>
+                {% endif %}
+    
+                <span class="current">
+                    Page {{ orders.number }} of {{ orders.paginator.num_pages }}.
+                </span>
+    
+                {% if orders.has_next %}
+                    <a href="?page={{ orders.next_page_number }}">next</a>
+                    <a href="?page={{ orders.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+   
+</div>
+{% endblock %}

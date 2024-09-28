@@ -1,0 +1,42 @@
+{% extends 'cadmin/base.html' %}
+
+{% block content %}
+<body>
+    <div class="container ">
+        <h1>Edit Category</h1>
+        
+        <form  method="POST"enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label>Category Name</label> 
+                    {{ form.category_name }}
+                </div>
+                <div class="form-group col-md-12">
+                    <label>Category Slug</label> 
+                    {{  form.slug }}
+                </div>
+                <div class="form-group col-md-12">
+                    <label>Descriotion</label> 
+                    {{  form.description }}
+                </div>
+                <div class="form-group col-md-6">
+                    <label>Category Image</label> 
+                    {{ form.cat_image }}
+                </div>
+                <div class="form-group col-md-6">
+                    <label>Is Active</label> 
+                    {{ form.is_active }}
+                </div>
+               
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn-submit">Submit</button>
+                <button type="reset" class="btn-cancel">Cancel</button>
+            </div>
+        </form>
+    </div>
+   
+</body>
+
+{% endblock  %}

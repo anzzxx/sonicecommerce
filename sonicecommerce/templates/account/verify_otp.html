@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+<section class="section-content padding-y" style="min-height:84vh">
+    {% if request.GET.command == 'verification' %}
+    <div class="container mx-auto alert alert-info text-center" role="alert" style="max-width: 1024px; margin-top:100px;">
+        Thank you for registering with us. We have sent you a verification code to your phone number.
+        <br><br>
+        Already verified? <a href="{% url 'login' %}">Login</a>
+    </div>
+    {% else %}
+    <div class="card mx-auto" style="max-width: 380px; margin-top:100px;">
+        <div class="card-body">
+            <h4 class="card-title mb-4">Verify OTP</h4>
+            {% include "includes/alerts.html" %}
+            <form action="{% url 'verify_otp' %}" method="post" onsubmit="return validateOtpForm()">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="otp">Enter OTP:</label>
+                    <input type="text" class="form-control" name="otp" id="otp" required>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-block">Verify OTP</button>
+                </div>
+            </form>
+            <p class="text-center mt-4">Resend OTP in <span id="timer">01:00</span></p>
+            <button id="resendOtpBtn" class="btn btn-link" style="display:none;">Resend OTP</button>
+        </div>
+    </div>
+    {% endif %}
+</section>
+
+<script>
+    let timer;
+    let isResendAllowed = false;
+
+    function validateOtpForm() {
+        const otp = document.getElementById("otp").value;
+        if (otp === "") {
+            alert("Please enter the OTP.");
+            return false;
+        }
+        return true;
+    }
+
+    function startTimer(duration, display) {
+        let timerDuration = duration;
+        clearInterval(timer); // Clear existing timer if any
+        timer = setInterval(function () {
+            let minutes = parseInt(timerDuration / 60, 10);
+            let seconds = parseInt(timerDuration % 60, 10);
+
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            display.textContent = minutes + ":" + seconds;
+
+            if (--timerDuration < 0) {
+                clearInterval(timer);
+                display.textContent = "00:00";
+                isResendAllowed = true;
+                document.getElementById('resendOtpBtn').style.display = 'block';
+            }
+        }, 1000);
+    }
+
+    function resendOtp() {
+        if (!isResendAllowed) return;
+
+        fetch("{% url 'resend-otp' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({})  // Sending empty body as phone number is handled on server side
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('OTP has been resent.');
+                document.getElementById('resendOtpBtn').style.display = 'none';  // Hide button immediately
+                isResendAllowed = false;  // Disable resend button until the timer finishes
+                startTimer(60, document.querySelector('#timer'));  // Restart timer
+                location.reload(); // Refresh the page immediately
+            } else {
+                alert('Failed to resend OTP. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            location.reload();
+        });
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    window.onload = function () {
+        const oneMinute = 60;  // 60 seconds
+        const display = document.querySelector('#timer');
+        startTimer(oneMinute, display);
+
+        // Bind resendOtp function to button click
+        const resendButton = document.getElementById('resendOtpBtn');
+        if (resendButton) {
+            resendButton.addEventListener('click', resendOtp);
+        } else {
+            location.reload(); 
+        }
+    };
+</script>
+
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        {% include "includes/dashboard_sidebar.html" %}
+        <div class="col-lg-9">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    
+
+                    <div class="alert alert-light border">
+                        <ul class="list-unstyled mb-0">
+                            <li><strong>Order ID:</strong> {{order.order_number}}</li>
+                            <li><strong>Transaction ID:</strong> {{order.payment.payment_id}}</li>
+                            <li><strong>Order Date:</strong> {{order.created_at}}</li>
+                            <li><strong>Payment Status:</strong> {{order.payment.status}}</li>
+                            <li><strong>Order Status:</strong> {{order.status}}</li>
+                            {% if request_exist %}
+                            <li><strong>Request Status:</strong> {{request_status.status}}</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+
+                    <div class="table-responsive mt-4">
+                        <table class="table table-bordered">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th class="text-center">Description</th>
+                                    <th class="text-center">Quantity</th>
+                                    <th class="text-center">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order_detail %}
+                                <tr>
+                                    <td>
+                                        {{item.product.product_name}}
+                                        <p class="text-muted small mb-0">
+                                            {% if item.variation.all %}
+                                                {% for i in item.variation.all %}
+                                                    {{i.variation_category | capfirst}}: {{i.variation_value | capfirst}} <br>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </p>
+                                    </td>
+                                    <td class="text-center">{{item.quantity}}</td>
+                                    <td class="text-center">{{item.product_price}} USD</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="2" class="text-right">Sub Total:</th>
+                                    <th class="text-center">${{sub_total}}</th>
+                                </tr>
+                                <tr>
+                                    <th colspan="2" class="text-right">Tax:</th>
+                                    <th class="text-center">${{order.tax}}</th>
+                                </tr>
+                                <tr>
+                                    <th colspan="2" class="text-right">Grand Total:</th>
+                                    <th class="text-center">${{order.order_total}}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div class="mt-4">
+                      {% if request_exist %}
+                      {% else %}
+                        <a href="{% url 'request_cancel_or_return' order_id=order.id %}" class="btn btn-danger btn-sm mr-2">Cancel Order</a>
+
+                        {% if order.status == 'Deliverd' %}
+                        <a href="{% url 'request_cancel_or_return' order_id=order.id %}" class="btn btn-warning btn-sm">Return Order</a>
+                        {% endif %}
+                        {% endif %}
+                        <a href="{% url 'invoice' order_id=order.order_number %}" class="btn btn-danger btn-sm mr-2">Get Invoice</a>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <h5 class="mb-3">Delivery Address</h5>
+                    <div class="alert alert-info">
+                        <strong>{{order.full_name}}</strong><br>
+                        {{order.full_address}}<br>
+                        {{order.city}}, {{order.state}}<br>
+                        {{order.country}}<br>
+                        <small class="text-muted">Phone: {{order.phone}}</small>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <p class="text-muted">Thank you for shopping with us!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
