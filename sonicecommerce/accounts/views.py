@@ -548,77 +548,104 @@ def change_password(request):
             messages.error(request,'password does not match')
             return redirect('change_password')
     return render(request,'account/change_password.html')
-@login_required(login_url='login')
-def order_details(request,order_id):
-    
-    order_detail=OrderProduct.objects.filter(order__order_number=order_id)
-    order=Order.objects.get(order_number=order_id)
-    request_exist = OrderRequest.objects.filter(order=order).exists() 
-    request_status = OrderRequest.objects.filter(order=order).first() 
-    sub_total=0
-    for i in order_detail:
-        sub_total +=i.product_price*i.quantity
-    context={
-        'order_detail':order_detail,
-        'order':order,
-        'sub_total':sub_total,
-        'request_exist':request_exist,
-        'request_status':request_status
 
+@login_required(login_url='login')
+def order_details(request, order_id):
+    """
+    Display the details of a specific order, including order products,
+    subtotal, and request status if applicable.
+
+    Args:
+        request: The HTTP request object.
+        order_id: The order number to retrieve details for.
+
+    Returns:
+        Renders the 'order_detail.html' template with order details and context.
+    """
+    order_detail = OrderProduct.objects.filter(order__order_number=order_id)
+    order = Order.objects.get(order_number=order_id)
+    request_exist = OrderRequest.objects.filter(order=order).exists()
+    request_status = OrderRequest.objects.filter(order=order).first()
+    
+    sub_total = 0
+    for i in order_detail:
+        sub_total += i.product_price * i.quantity
+    
+    context = {
+        'order_detail': order_detail,
+        'order': order,
+        'sub_total': sub_total,
+        'request_exist': request_exist,
+        'request_status': request_status
     }
-    return render(request,'account/order_detail.html',context)
+    return render(request, 'account/order_detail.html', context)
 
 @login_required
 def address(request):
+    """
+    Display a list of addresses associated with the user's profile.
+
+    Args:
+        request: The HTTP request object.
+
+    Returns:
+        Renders the 'address.html' template with the user's address list.
+    """
     try:
-        # Fetch the UserProfile for the current user
         user_profile = UserProfile.objects.get(user=request.user)
-        # Fetch addresses related to this UserProfile
         address_list = Address.objects.filter(user_profile=user_profile)
     except UserProfile.DoesNotExist:
-        # Handle case where UserProfile does not exist
         address_list = []
-
+    
     context = {
         'address': address_list
     }
     return render(request, 'account/address.html', context)
+
 def add_address(request):
-    # Get the 'next' parameter or default to the addresses list page
+    """
+    Handle the addition of a new address. If POST method, validate and save
+    the address, setting it as the primary address. If GET, render the form.
+
+    Args:
+        request: The HTTP request object.
+
+    Returns:
+        Redirects to the 'next' URL or the address list page if successful,
+        or renders the 'add_address.html' form if unsuccessful.
+    """
     next_url = request.GET.get('next', reverse('address'))
-     # Replace 'addresses' with your address list URL name
 
     if request.method == "POST":
         address_form = AddressForm(request.POST)
         if address_form.is_valid():
-            # Save the new address
             address = address_form.save(commit=False)
             address.user_profile = request.user.userprofile
-            
-            # Mark all previous addresses as non-primary
             Address.objects.filter(user_profile=address.user_profile).update(is_primary=False)
-            
-            # Set the new address as primary
             address.is_primary = True
             address.save()
-            
-            # Show a success message
             messages.success(request, 'New address added successfully!')
-            
-            # Redirect to the 'next' URL (e.g., checkout) or fallback to the address page
-            print(f'url {next_url}')
             return redirect(next_url)
-    
     else:
         address_form = AddressForm()
-    
-    # Render the address form
+
     context = {
         'address_form': address_form,
     }
     return render(request, 'account/add_address.html', context)
 
 def edit_address(request, address_id):
+    """
+    Handle the editing of an existing address.
+
+    Args:
+        request: The HTTP request object.
+        address_id: The ID of the address to be edited.
+
+    Returns:
+        Redirects to the address list if successful, or renders the 
+        'edit_address.html' form if unsuccessful.
+    """
     address = get_object_or_404(Address, id=address_id)
 
     if request.method == "POST":
@@ -626,29 +653,48 @@ def edit_address(request, address_id):
         if address_form.is_valid():
             address_form.save()
             messages.success(request, 'Address updated successfully!')
-            return redirect('address')  # Redirect to the address list or another relevant page
+            return redirect('address')
     else:
         address_form = AddressForm(instance=address)
-    
+
     context = {
         'address_form': address_form,
         'address': address,
     }
-    return render(request, 'account/edit_address.html', context)    
+    return render(request, 'account/edit_address.html', context)
 
 def delete_address(request, address_id):
+    """
+    Handle the deletion of an existing address.
+
+    Args:
+        request: The HTTP request object.
+        address_id: The ID of the address to be deleted.
+
+    Returns:
+        Redirects to the address list after successful deletion, or renders 
+        the 'delete_address.html' template if confirmation is required.
+    """
     address = get_object_or_404(Address, id=address_id)
     
     if request.method == "POST":
         address.delete()
         messages.success(request, 'Address deleted successfully!')
-        return redirect('address')  
+        return redirect('address')
 
     return render(request, 'account/delete_address.html', {'address': address})
 
 @login_required
 def change_address(request):
-  
+    """
+    Display a list of addresses for the user to change their current address.
+
+    Args:
+        request: The HTTP request object.
+
+    Returns:
+        Renders the 'change_address.html' template with the list of addresses.
+    """
     user = request.user
     address = Address.objects.filter(user_profile=user.userprofile)
 
@@ -656,17 +702,22 @@ def change_address(request):
         'address': address,
     }
     return render(request, 'account/change_address.html', context)
-def select_address(request, address_id):
-    
-    selected_address = get_object_or_404(Address, id=address_id)
 
+def select_address(request, address_id):
+    """
+    Set a selected address as the primary address for the user.
+
+    Args:
+        request: The HTTP request object.
+        address_id: The ID of the address to be set as primary.
+
+    Returns:
+        Redirects to the 'checkout' page after updating the primary address.
+    """
+    selected_address = get_object_or_404(Address, id=address_id)
     selected_address.is_primary = True
     selected_address.save()
-    
+
     Address.objects.exclude(id=address_id).update(is_primary=False)
-    
-    return redirect('checkout')   
 
-
-
-
+    return redirect('checkout')
